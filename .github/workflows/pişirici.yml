@@ -22,21 +22,21 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Bağımlılıkları Kur
+      - name: Bağımlılıkları Zorla Kur
         run: |
-          pnpm install --no-frozen-lockfile --ignore-scripts
+          pnpm install --no-frozen-lockfile
+          # Eğer expo hala eksik görünüyorsa zorla yükle
+          pnpm add expo@latest --save-dev
+          pnpm add eas-cli expo -g
 
-      - name: Expo Ayarlarını Düzelt
+      - name: iOS Ayarlarını Temizle ve Hazırla
         run: |
-          # Eğer ios tanımı yoksa ekle
-          npx expo install expo-updates
-          sed -i '' 's/"platforms": \[/"platforms": ["ios", /g' app.json || echo "Platform ayarı zaten var"
-
-      - name: iOS Export (Zorla)
-        run: |
-          pnpm add -g eas-cli expo
-          # npx expo export yerine daha sağlam olan prebuild adımını deniyoruz
+          # Expo'yu sisteme zorla tanıtıyoruz
+          npx expo install expo
           npx expo prebuild --platform ios --no-install
+
+      - name: iOS Export
+        run: |
           npx expo export --platform ios --non-interactive
 
       - name: IPA Dosyasını Sakla
