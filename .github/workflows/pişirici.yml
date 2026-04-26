@@ -11,24 +11,25 @@ jobs:
       - name: Kodları Çek
         uses: actions/checkout@v4
 
+      - name: pnpm Kur
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
       - name: Node.js Kur
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'pnpm'
 
-      - name: Temizlik ve Kurulum
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install --legacy-peer-deps
+      - name: Bağımlılıkları pnpm ile Kur
+        run: pnpm install
 
       - name: Expo ve EAS Hazırla
-        run: |
-          npm install -g eas-cli
-          npm install -g expo
+        run: pnpm add -g eas-cli expo
 
-      - name: iOS Export (Hata Ayıklama Modu)
-        run: |
-          npx expo export --platform ios --non-interactive
+      - name: iOS Export
+        run: npx expo export --platform ios --non-interactive
 
       - name: IPA Dosyasını Sakla
         uses: actions/upload-artifact@v4
