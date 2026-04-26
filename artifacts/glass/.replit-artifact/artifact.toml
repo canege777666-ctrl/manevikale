@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "Glass"
+version = "1.0.0"
+id = "artifacts/glass"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 24215
+
+[services.development]
+run = "pnpm --filter @workspace/glass run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/glass", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/glass", "run", "serve" ]
+
+[services.env]
+PORT = "24215"
+BASE_PATH = "/"

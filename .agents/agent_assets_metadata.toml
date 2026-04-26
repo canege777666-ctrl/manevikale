@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "s_qcUXfdaH8AkT8-kSxi7"
+uri = "file://artifacts/glass/assets/images/icon.png"
+type = "image"
+title = "spiritual glass icon"
+
+[[generated]]
+id = "EbEPoROtOk0Kp8M6ASHAu"
+uri = "file://artifacts/glass/assets/images/bg-aurora.png"
+type = "image"
+title = "aurora gradient bg"
+
+[[generated]]
+id = "Pc_ddLkWk1Qs0sRQ9najx"
+uri = "file://artifacts/glass/assets/images/bg-sunrise.png"
+type = "image"
+title = "sunrise gradient bg"
+
+[[generated]]
+id = "thHuFdzFgXWVCLDgI9fF1"
+uri = "file://artifacts/glass/assets/images/bg-ocean.png"
+type = "image"
+title = "ocean gradient bg"
+
+[[generated]]
+id = "-ms-VysxJpDWnhHBMzPcm"
+uri = "file://artifacts/glass/assets/images/bg-spiritual.png"
+type = "image"
+title = "generated_image"
