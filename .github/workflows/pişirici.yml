@@ -12,9 +12,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: pnpm Kur
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
-          version: 9 # Versiyonu 9'a çektik, katalog desteği daha sağlam
+          version: 9
 
       - name: Node.js Kur
         uses: actions/setup-node@v4
@@ -22,17 +22,21 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Bağımlılıkları Kur (Hataları Atla)
+      - name: Bağımlılıkları Kur
         run: |
-          pnpm config set verify-store-integrity false
-          pnpm install --no-frozen-lockfile
+          pnpm install --no-frozen-lockfile --ignore-scripts
 
-      - name: Expo ve EAS Hazırla
+      - name: Expo Ayarlarını Düzelt
+        run: |
+          # Eğer ios tanımı yoksa ekle
+          npx expo install expo-updates
+          sed -i '' 's/"platforms": \[/"platforms": ["ios", /g' app.json || echo "Platform ayarı zaten var"
+
+      - name: iOS Export (Zorla)
         run: |
           pnpm add -g eas-cli expo
-
-      - name: iOS Export
-        run: |
+          # npx expo export yerine daha sağlam olan prebuild adımını deniyoruz
+          npx expo prebuild --platform ios --no-install
           npx expo export --platform ios --non-interactive
 
       - name: IPA Dosyasını Sakla
