@@ -16,21 +16,22 @@ jobs:
         with:
           node-version: 18
 
-      - name: Bağımlılıkları Sıfırdan Kur
+      - name: Temizlik ve Kurulum
         run: |
+          rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
 
-      - name: Expo ve EAS CLI Hazırla
+      - name: Expo ve EAS Hazırla
         run: |
           npm install -g eas-cli
           npm install -g expo
 
-      - name: iOS Projesini Derle (Export)
+      - name: iOS Export (Hata Ayıklama Modu)
         run: |
-          npx expo export --platform ios
+          npx expo export --platform ios --non-interactive
 
-      - name: IPA Dosyasını Artifact Olarak Yükle
+      - name: IPA Dosyasını Sakla
         uses: actions/upload-artifact@v4
         with:
-          name: Manevi-Kale-IPA-Build
+          name: Manevi-Kale-IPA
           path: dist/
