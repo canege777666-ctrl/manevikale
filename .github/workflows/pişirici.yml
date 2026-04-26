@@ -1,4 +1,3 @@
-
 name: Manevi Kale IPA Pişirici
 on:
   push:
@@ -10,25 +9,28 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Kodları Çek
-        uses: actions/checkout@v4 # v3 yerine v4 yaptık
+        uses: actions/checkout@v4
 
       - name: Node.js Kur
-        uses: actions/setup-node@v4 # v3 yerine v4 yaptık
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
 
-      - name: Modülleri Yükle
-        run: npm install
+      - name: Bağımlılıkları Sıfırdan Kur
+        run: |
+          npm install --legacy-peer-deps
 
-      - name: Expo Kur
-        run: npm install -g eas-cli
+      - name: Expo ve EAS CLI Hazırla
+        run: |
+          npm install -g eas-cli
+          npm install -g expo
 
-      - name: iOS Projesini Hazırla
-        run: npx expo export --platform ios
+      - name: iOS Projesini Derle (Export)
+        run: |
+          npx expo export --platform ios
 
-      - name: IPA Dosyasını Paketle ve Sakla
-        uses: actions/upload-artifact@v4 # v3 yerine v4 yaptık
+      - name: IPA Dosyasını Artifact Olarak Yükle
+        uses: actions/upload-artifact@v4
         with:
-          name: Manevi-Kale-IPA
+          name: Manevi-Kale-IPA-Build
           path: dist/
