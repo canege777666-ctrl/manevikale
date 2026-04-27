@@ -21,18 +21,21 @@ jobs:
           cache: 'pnpm'
 
       - name: Bağımlılıkları Kur
-        # --no-frozen-lockfile ekledik ki pnpm mızmızlanmasın
         run: pnpm install --no-frozen-lockfile
 
       - name: iOS Projesini Oluştur (Prebuild)
-        # npx yerine pnpm dlx kullanarak expo'yu çalıştırıyoruz
-        run: pnpm dlx expo prebuild --platform ios --no-install
+        # --install flag'ini ekledik ki Cocoapods ve workspace oluşsun
+        run: pnpm dlx expo prebuild --platform ios
 
       - name: Xcode ile Derle (Unsigned)
         run: |
           cd ios
-          xcodebuild -workspace *.xcworkspace \
-            -scheme $(ls -d *.xcodeproj | sed 's/\.xcodeproj//') \
+          # Dosya adını dinamik alıyoruz, hata payını sıfırlıyoruz
+          WORKSPACE_NAME=$(ls -d *.xcworkspace)
+          SCHEME_NAME=$(ls -d *.xcodeproj | sed 's/\.xcodeproj//')
+          
+          xcodebuild -workspace "$WORKSPACE_NAME" \
+            -scheme "$SCHEME_NAME" \
             -configuration Release \
             -sdk iphoneos \
             CODE_SIGNING_ALLOWED=NO \
