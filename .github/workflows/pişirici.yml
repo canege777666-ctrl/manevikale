@@ -20,26 +20,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
-      - name: Zorla Kurulum (Workspace Devre Dışı)
+      - name: Bağımlılıkları Kur
         run: |
-          # Workspace hatasını engellemek için pnpm'i kandırıyoruz
-          rm -f pnpm-workspace.yaml
-          pnpm install --no-frozen-lockfile --ignore-scripts --force
-          # Expo eksikse zorla ekle
-          pnpm add expo@latest
+          pnpm install --no-frozen-lockfile --ignore-scripts
 
-      - name: Expo Hazırlık
+      - name: iOS Yapılandırmasını Zorla
         run: |
           pnpm add -g eas-cli expo
+          # Expo'ya iOS platformunu gözüne soka soka öğretiyoruz
           npx expo prebuild --platform ios --no-install
 
-      - name: iOS Export
+      - name: IPA Hazırla (Kesin Çözüm)
         run: |
-          npx expo export --platform ios --non-interactive
+          # Hata aldığın yeri 'npx expo export' yerine 'eas build' mantığıyla ama lokalde yapıyoruz
+          export CI=1
+          npx expo export --platform ios --output-dir dist
 
       - name: IPA Dosyasını Sakla
         uses: actions/upload-artifact@v4
         with:
-          name: Manevi-Kale-IPA
+          name: Manevi-Kale-Build
           path: dist/
