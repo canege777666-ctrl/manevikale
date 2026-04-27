@@ -1,8 +1,6 @@
-name: Manevi Kale IPA Pişirici
+name: Manevi Kale IPA Hazırla
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch: # Sadece butona basınca çalışsın (veya push ekle)
 
 jobs:
   build:
@@ -11,35 +9,41 @@ jobs:
       - name: Kodları Çek
         uses: actions/checkout@v4
 
-      - name: pnpm Kur
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Node.js Kur
+      - name: Node Kur
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
       - name: Bağımlılıkları Kur
-        run: |
-          pnpm install --no-frozen-lockfile --ignore-scripts
+        run: npm install
 
-      - name: iOS Yapılandırmasını Zorla
-        run: |
-          pnpm add -g eas-cli expo
-          # Expo'ya iOS platformunu gözüne soka soka öğretiyoruz
-          npx expo prebuild --platform ios --no-install
+      - name: iOS Projesini Oluştur (Prebuild)
+        run: npx expo prebuild --platform ios --no-install
 
-      - name: IPA Hazırla (Kesin Çözüm)
+      - name: Xcode ile Derle (Unsigned)
         run: |
-          # Hata aldığın yeri 'npx expo export' yerine 'eas build' mantığıyla ama lokalde yapıyoruz
-          export CI=1
-          npx expo export --platform ios --output-dir dist
+          cd ios
+          xcodebuild -workspace *.xcworkspace \
+            -scheme $(ls -d *.xcodeproj | sed 's/\.xcodeproj//') \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            -derivedDataPath build
 
-      - name: IPA Dosyasını Sakla
+      - name: IPA Paketle (KSign için hazır)
+        run: |
+          mkdir -p Payload
+          # Oluşan .app dosyasını bul ve Payload içine kopyala
+          cp -R ios/build/Build/Products/Release-iphoneos/*.app Payload/
+          # Payload klasörünü zipleyip .ipa yap
+          zip -r ManeviKale_Unsigned.ipa Payload
+
+      - name: Dosyayı Yükle
         uses: actions/upload-artifact@v4
         with:
-          name: Manevi-Kale-Build
-          path: dist/
+          name: KSign-Hazir-IPA
+          path: ManeviKale_Unsigned.ipa
