@@ -1,6 +1,6 @@
 name: Manevi Kale IPA Hazırla
 on:
-  workflow_dispatch: # Sadece butona basınca çalışsın (veya push ekle)
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,16 +9,24 @@ jobs:
       - name: Kodları Çek
         uses: actions/checkout@v4
 
+      - name: pnpm Kur
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Node Kur
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       - name: Bağımlılıkları Kur
-        run: npm install
+        # --no-frozen-lockfile ekledik ki pnpm mızmızlanmasın
+        run: pnpm install --no-frozen-lockfile
 
       - name: iOS Projesini Oluştur (Prebuild)
-        run: npx expo prebuild --platform ios --no-install
+        # npx yerine pnpm dlx kullanarak expo'yu çalıştırıyoruz
+        run: pnpm dlx expo prebuild --platform ios --no-install
 
       - name: Xcode ile Derle (Unsigned)
         run: |
@@ -37,9 +45,7 @@ jobs:
       - name: IPA Paketle (KSign için hazır)
         run: |
           mkdir -p Payload
-          # Oluşan .app dosyasını bul ve Payload içine kopyala
           cp -R ios/build/Build/Products/Release-iphoneos/*.app Payload/
-          # Payload klasörünü zipleyip .ipa yap
           zip -r ManeviKale_Unsigned.ipa Payload
 
       - name: Dosyayı Yükle
