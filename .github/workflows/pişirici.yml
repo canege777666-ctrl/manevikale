@@ -20,19 +20,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      - name: Bağımlılıkları Zorla Kur
+      - name: Zorla Kurulum (Workspace Devre Dışı)
         run: |
-          pnpm install --no-frozen-lockfile
-          # Eğer expo hala eksik görünüyorsa zorla yükle
-          pnpm add expo@latest --save-dev
-          pnpm add eas-cli expo -g
+          # Workspace hatasını engellemek için pnpm'i kandırıyoruz
+          rm -f pnpm-workspace.yaml
+          pnpm install --no-frozen-lockfile --ignore-scripts --force
+          # Expo eksikse zorla ekle
+          pnpm add expo@latest
 
-      - name: iOS Ayarlarını Temizle ve Hazırla
+      - name: Expo Hazırlık
         run: |
-          # Expo'yu sisteme zorla tanıtıyoruz
-          npx expo install expo
+          pnpm add -g eas-cli expo
           npx expo prebuild --platform ios --no-install
 
       - name: iOS Export
